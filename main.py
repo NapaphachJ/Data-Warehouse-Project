@@ -3,29 +3,29 @@
 """
 def read_layout_from_file(file_name): 
   with  open(file_name,'r') as file: 
-    content = file.read() #อ่านไฟล์
-    content_list = content.split() #splitแบ่งทีละบรรทัด
+    content = file.read() 
+    content_list = content.split() 
     
     # build list to put element of layout
-    layout=[] #listที่เก็บแผนผัง
-    for i in content_list: #loop data แต่ละบรรทัด
-      if i == '*': #ถ้าเจอ*คือจบแผนผัง
+    layout=[] 
+    for i in content_list:
+      if i == '*': 
         break
       else:
         map = []
-        for j in i: #loopใส่[]ด้านใน
+        for j in i:
           map.append(j)
-      layout.append(map) #ใส่[]ด้านนอก
+      layout.append(map) 
     
     #build store shelves using dictionary
-    dic_store={} #dictที่เก็บชั้นวาง
+    dic_store={} 
     for i in range (len(content_list)): 
-      if i > content_list.index('*'): #เริ่มเก็บหลังตัวที่เป็น*
-        each_store = content_list[i].split(':') #แบ่งชั้นวางกับหมายเลข
-        for j in each_store: #loopเพื่อแบ่งหมายเลขแต่ละตัว
-          num=j.split(',') #split number
-        num = [int(i) for i in num] #str to int
-        dic_store[each_store[0]] = num #นำชั้นวางและหมายเลขเก็บในdict
+      if i > content_list.index('*'): 
+        each_store = content_list[i].split(':') 
+        for j in each_store: 
+          num=j.split(',') 
+        num = [int(i) for i in num] 
+        dic_store[each_store[0]] = num 
  
   return Warehouse(layout,dic_store)
 
@@ -44,7 +44,7 @@ class Warehouse:
     return ตัวอักษรของชั้นวางสินค้าสำหรับกล่องสินค้าที่ระบุ
   """
   def find_shelf (self, label): 
-    key_shelve = [i for i in self.shelves] #List Comprehensions to Get Keys
+    key_shelve = [i for i in self.shelves] 
     return key_shelve[label % len(self.shelves)]
 
   
@@ -54,25 +54,25 @@ class Warehouse:
   """
   def find_path (self, start_position, end_position): 
     #using BFS algorithm
-    queue = [] #list เก็บ queue ของเส้นทาง
-    queue.append([start_position]) # เพิ่ม path แรกเข้า queue
-    visited = [] #list เก็บทุกเส้นทางที่เดินผ่านไปแล้ว
-    solution = [] #list เก็บทางหุ่นยนต์เดินได้
+    queue = [] 
+    queue.append([start_position]) 
+    visited = [] 
+    solution = [] 
 
-    layout = self.layout #list แผนผัง
-    rows = len(layout) # rowแผนผัง
-    cols = len(layout[0]) # columnแผนผัง 
+    layout = self.layout 
+    rows = len(layout) 
+    cols = len(layout[0]) 
     
     #loop จนกระทั่ง checked ครบทุกทางเดิน
-    while (len(queue) != 0) : #queue is not empty
-      path = queue.pop(0) # ลบ first path ออกจาก queue
-      node = path[len(path) - 1] #nodeสุดท้ายของเส้นทาง
+    while (len(queue) != 0) :
+      path = queue.pop(0) 
+      node = path[len(path) - 1] 
       
-      if node in visited : #ถ้ามีnodeอยู่ในเส้นทางที่เดินไปแล้วให้ข้ามไปเส้นทางอื่น
+      if node in visited :
         continue
         
-      a = node[0] #indexแรกของnode
-      b = node[1] #indexที่สองของnode 
+      a = node[0] 
+      b = node[1] 
 
       #The way that robot can walk without obtrucal
       if 0 <= a-1 < rows and 0 <= b < cols and layout[a-1][b] != '#' :
@@ -85,15 +85,15 @@ class Warehouse:
         solution.append((a,b-1)) #left 
 
         
-      for adj in solution: #loop เส้นทางทั้งหมดที่เดิน
-        pathway_new = list(path) #list เก็บเส้นทางตั้งต้น
-        pathway_new.append(adj) #เพิ่มเส้นทางใน list
-        queue.append(pathway_new) #วนหาเส้นทางอีกครั้ง
-        if adj == end_position : #เส้นทางเท่ากับเส้นทางสุดท้าย
+      for adj in solution: 
+        pathway_new = list(path)
+        pathway_new.append(adj) 
+        queue.append(pathway_new) 
+        if adj == end_position : 
           print(pathway_new)
-          return pathway_new #คืนค่าเส้นทางที่ถูกต้อง(ไม่ชน)
+          return pathway_new 
           
-      visited.append(node) #เพิ่มเส้นทางใน list ที่เก็บเส้นทางที่เดินไปแล้ว
+      visited.append(node) 
         
     
   """
@@ -103,19 +103,19 @@ class Warehouse:
   """
   def add_box(self, label, start_position): 
     shelf_name = self.find_shelf(label) #ชื่อชั้นวาง ex.A B..
-    shelf_number = self.shelves[shelf_name] #listหมายเลขกล่องของชั้นวางนั้น
+    shelf_number = self.shelves[shelf_name] 
 
     #finding end position of path
-    for row in range (len(self.layout)): #loop index row of layout
-      for col in range (len(self.layout[row])): #loop index column of layout
-        if shelf_name == self.layout[row][col]: #ถ้าชื่อชั้นวางเดียวกัน
-          end_position = (row,col) #ให้กำหนดเป็นตำแหน่งสุดท้ายในรูป tuple       
+    for row in range (len(self.layout)): 
+      for col in range (len(self.layout[row])):
+        if shelf_name == self.layout[row][col]: 
+          end_position = (row,col)    
 
     #If you don't already have this number, add a number of boxes.
-    if label not in shelf_number: #ถ้า label ไม่อยู่ใน list เลขกล่อง
-      shelf_number.append(label) #เพิ่มเข้าไปในlist หมายเลขกล่อง
-      path = self.find_path(start_position, end_position) #หาเส้นทางที่ใช้
-      return shelf_name,shelf_number,path  #ตัวอักษรชั้นวาง,หมายเลขกล่องทั้งหมด,เส้นทาง
+    if label not in shelf_number: 
+      shelf_number.append(label)
+      path = self.find_path(start_position, end_position) 
+      return shelf_name,shelf_number,path 
 
     return None,None,None #กรณีมีหมายเลขนั้นอยู่แล้ว ไม่สามารถใส่เพิ่มได้
   
@@ -126,21 +126,21 @@ class Warehouse:
   """
   def remove_box(self, label, start_position): 
     shelf_name = self.find_shelf(label) #ชื่อชั้นวาง ex.A B..
-    shelf_number = self.shelves[shelf_name] #listหมายเลขกล่องของชั้นวางนั้น
+    shelf_number = self.shelves[shelf_name] 
 
     #finding end position of path
-    for row in range (len(self.layout)): #loop index row of layout
-      for col in range (len(self.layout[row])): #loop index column of layout
-        if shelf_name == self.layout[row][col]: #ถ้าชื่อชั้นวางเดียวกัน
-          end_position = (row,col) #ให้กำหนดเป็นตำแหน่งสุดท้ายในรูป tuple       
+    for row in range (len(self.layout)): 
+      for col in range (len(self.layout[row])): 
+        if shelf_name == self.layout[row][col]: 
+          end_position = (row,col)       
 
     #If you have this number then remove a number of boxes.
-    if label in shelf_number: #ถ้า label อยู่ใน list เลขกล่อง
-      shelf_number.remove(label) #ลบ label ในlist หมายเลขกล่อง
-      path = self.find_path(start_position, end_position) #หาเส้นทางที่ใช้
-      return shelf_name,shelf_number,path  #ตัวอักษรชั้นวาง,หมายเลขกล่องทั้งหมด,เส้นทาง
+    if label in shelf_number: 
+      shelf_number.remove(label)
+      path = self.find_path(start_position, end_position)
+      return shelf_name,shelf_number,path  
 
-    return None,None,None #กรณีไม่มีหมายเลขนั้นอยู่ จะไม่สามารถนำกล่องออกมาได้
+    return None,None,None 
 
   ''' 
   Bonus Shortest path
